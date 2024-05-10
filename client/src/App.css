@@ -1,0 +1,32 @@
+header{
+    width: 100vw;
+    height: 5vh;
+    background-color: rgb(32, 37, 36);
+    color: aliceblue;
+    border-bottom: solid 0.1rem black;
+}
+#content{
+    display: flex;
+}
+#contacts{
+    background-color: aqua;
+    width: 20vw;
+    height: calc((100vh - 6vh));
+}
+
+#contacts ul{
+    list-style-type: none;
+}
+
+#contacts ul li{
+    border: 0.1px solid black;
+    padding: 10px 10px;
+    background-color:blueviolet;
+}
+
+#chat{
+    width: 80vw;
+    background-color: blue;
+    height: calc(100vh - 6vh);
+}
+
