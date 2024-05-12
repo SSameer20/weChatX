@@ -58,6 +58,7 @@ const authUser = asyncHandler(async (req,res) =>{
 
     const user = await User.findOne({email});
     if(user && (await user.matchPassword(password))){
+        res.status(201);
         res.json({
             _id : user._id,
             name : user.name,
@@ -65,7 +66,7 @@ const authUser = asyncHandler(async (req,res) =>{
             pic : user.pic,
             token : generateToken(user._id),
         });
-        res.send({
+        console.log({
             _id : user._id,
             name : user.name,
             email : user.email,

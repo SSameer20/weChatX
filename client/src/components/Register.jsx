@@ -1,21 +1,86 @@
 import React, { useState } from 'react'
-import { VStack, FormControl, FormLabel, Input,  InputGroup, InputRightElement, Button } from '@chakra-ui/react'
+import axios from "axios";
+import { useNavigate } from 'react-router-dom';
+import { useToast, VStack, FormControl, FormLabel, Input, InputGroup, InputRightElement, Button } from '@chakra-ui/react'
+
 
 export default function
     () {
     const [email, setEmail] = useState('')
-    const [username, setUsername] = useState('')
+    const [name, setName] = useState('')
     const [password, setPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
-    const [pic, setPic] = useState('')
     const [show, setShow] = useState(false)
     const [confirmShow, setConfirmShow] = useState(false)
+    const [loading, setLoading] = useState(false)
+    const toast = useToast();
+    const navigate = useNavigate();
 
-        const submitHandler = () => {
+
+
+    const submitHandler = async () => {
+        setLoading(true);
+        if (!name || !email || !password) {
+            toast({
+                title: 'Please Fill All the fields',
+                description: "Required to fill all the fields",
+                status: 'error',
+                duration: 4000,
+                isClosable: true,
+                position : 'top'
+            })
+            setLoading(false);
+            return;
 
         }
 
-        const postDetails = (pics) => {}
+        if (password !== confirmPassword) {
+            toast({
+                title: 'Password does not match',
+                description: "Use Same password",
+                status: 'error',
+                duration: 3000,
+                isClosable: true,
+                position : 'top'
+            })
+            setLoading(false);
+            return;
+        }
+
+        try {
+            const config = {
+                headers : {
+                    "Content-type" : "application/json",
+                },
+            };
+            
+            const {data} = await axios.post(`http://localhost:3001/api/user`,{name, email, password}, config);
+            toast({
+                title: 'Registration Successful',
+                status: 'success',
+                duration: 3000,
+                isClosable: true,
+                position : 'top'
+            })
+            localStorage.setItem("userInfo", JSON.stringify(data));
+            setLoading(false);
+            navigate('/chat');
+        } catch (error) {
+            toast({
+                title: 'Error',
+                description: error.response.data.message,
+                status: 'error',
+                duration: 3000,
+                isClosable: true,
+                position : 'top'
+            })
+            setLoading(false);
+            
+        }
+
+    }
+
+
 
     return (
         <VStack>
@@ -26,7 +91,7 @@ export default function
 
             <FormControl id='full-name'>
                 <FormLabel>Full Name</FormLabel>
-                <Input type='text' value={username} onChange={(e) => { setUsername(e.target.value) }} />
+                <Input type='text' value={name} onChange={(e) => { setName(e.target.value) }} />
             </FormControl>
 
             <FormControl id='Password' isRequired>
@@ -41,31 +106,27 @@ export default function
                 </InputGroup>
 
             </FormControl>
-            <FormControl id='confirm-password'  isRequired>
+            <FormControl id='confirm-password' isRequired>
                 <FormLabel>Confirm Password</FormLabel>
                 <InputGroup >
-                <Input type={confirmShow ? 'text' : 'password'} value={confirmPassword} onChange={(e) => { setConfirmPassword(e.target.value) }} />
+                    <Input type={confirmShow ? 'text' : 'password'} value={confirmPassword} onChange={(e) => { setConfirmPassword(e.target.value) }} />
                     <InputRightElement>
                         <Button h='2rem' w='3.5rem' size='sm' p='5px' onClick={(e) => { setConfirmShow(!confirmShow) }}>
                             {confirmShow ? "Hide" : "Show"}
                         </Button>
                     </InputRightElement>
                 </InputGroup>
-               
+
             </FormControl>
 
-            <FormControl id='picture'>
-                <FormLabel>Picture</FormLabel>
-                <Input type='file' 
-                value={pic} onChange={(e) => { postDetails(e.target.files[0]) }} 
-                accept='image/*'/>
-            </FormControl>
+
 
             <Button
-            colorScheme='blue'
-            width='100%'
-            style = {{marginTop : 15}}
-            onClick={submitHandler}
+                colorScheme='blue'
+                width='100%'
+                style={{ marginTop: 15 }}
+                isLoading={loading}
+                onClick={submitHandler}
             >
                 Sign Up
             </Button>
